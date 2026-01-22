@@ -42,9 +42,14 @@ if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, '../../client/dist');
   app.use(express.static(clientBuildPath));
   
-  // Express 5: Use '/*' instead of '*' for catch-all routes
-  app.get('/*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  // Catch-all route for SPA - must be after all API routes
+  app.use((req, res, next) => {
+    // Only handle GET requests that don't start with /api
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    } else {
+      next();
+    }
   });
 }
 
