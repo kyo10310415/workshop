@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progresses Progress[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Workshop model
+model Workshop {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  materials  Material[]
+  progresses Progress[]
+
+  @@map("workshops")
+}
+
+// Material (PDF) model
+model Material {
+  id           Int      @id @default(autoincrement())
+  workshopId   Int
+  title        String
+  filename     String
+  originalName String
+  fileSize     Int
+  mimeType     String
+  pageCount    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  workshop Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  @@map("materials")
+}
+
+// Progress model (user x workshop)
+model Progress {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  workshopId Int
+  lastPage   Int      @default(1)
+  completed  Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workshop Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workshopId])
+  @@map("progresses")
+}
