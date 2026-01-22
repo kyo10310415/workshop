@@ -70,8 +70,8 @@ function App() {
           />
           
           {/* デフォルトルート */}
-          <Route path="/" element={<Navigate to="/workshops" />} />
-          <Route path="*" element={<Navigate to="/workshops" />} />
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
