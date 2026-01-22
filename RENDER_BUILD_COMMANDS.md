@@ -3,11 +3,11 @@
 ## 正しいBuild Command
 
 ```bash
-cd server && npm install --include=dev && npx prisma generate && npm run build && cd ../client && npm install && npm run build
+cd server && npm install --include=dev && npx prisma generate && npm run build && cd ../client && npm install --include=dev && npm run build
 ```
 
-**重要**: `--include=dev` フラグを追加して、devDependenciesもインストールします。
-これにより、TypeScript、Prisma CLI、型定義ファイルがインストールされます。
+**重要**: 両方のディレクトリに`--include=dev` フラグを追加して、devDependenciesもインストールします。
+これにより、TypeScript、Prisma CLI、型定義ファイル、Viteがインストールされます。
 
 ## Start Command
 

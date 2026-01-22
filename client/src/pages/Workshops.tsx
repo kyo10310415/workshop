@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getWorkshops, logout, Workshop } from '../api';
+import { getWorkshops, logout } from '../api';
+import type { Workshop } from '../api';
 import { useNavigate } from 'react-router-dom';
 
 export default function Workshops() {
