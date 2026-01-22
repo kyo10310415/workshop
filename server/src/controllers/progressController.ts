@@ -11,7 +11,7 @@ export const getProgress = async (req: AuthRequest, res: Response) => {
       where: {
         userId_workshopId: {
           userId,
-          workshopId: parseInt(workshopId)
+          workshopId: parseInt(workshopId as string)
         }
       }
     });
@@ -20,7 +20,7 @@ export const getProgress = async (req: AuthRequest, res: Response) => {
       progress = await prisma.progress.create({
         data: {
           userId,
-          workshopId: parseInt(workshopId),
+          workshopId: parseInt(workshopId as string),
           lastPage: 1,
           completed: false
         }
@@ -44,7 +44,7 @@ export const updateProgress = async (req: AuthRequest, res: Response) => {
       where: {
         userId_workshopId: {
           userId,
-          workshopId: parseInt(workshopId)
+          workshopId: parseInt(workshopId as string)
         }
       },
       update: {
@@ -53,7 +53,7 @@ export const updateProgress = async (req: AuthRequest, res: Response) => {
       },
       create: {
         userId,
-        workshopId: parseInt(workshopId),
+        workshopId: parseInt(workshopId as string),
         lastPage: lastPage ? parseInt(lastPage) : 1,
         completed: completed === true
       }

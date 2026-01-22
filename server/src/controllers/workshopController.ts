@@ -32,7 +32,7 @@ export const getWorkshopById = async (req: AuthRequest, res: Response) => {
     const isAdmin = req.user?.role === 'ADMIN';
 
     const workshop = await prisma.workshop.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id as string) },
       include: {
         materials: {
           select: {
@@ -93,7 +93,7 @@ export const updateWorkshop = async (req: AuthRequest, res: Response) => {
     const { title, description, isPublic } = req.body;
 
     const workshop = await prisma.workshop.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id as string) },
       data: {
         ...(title && { title }),
         ...(description !== undefined && { description }),
@@ -113,7 +113,7 @@ export const deleteWorkshop = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     await prisma.workshop.delete({
-      where: { id: parseInt(id) }
+      where: { id: parseInt(id as string) }
     });
 
     return res.json({ message: 'Workshop deleted successfully' });

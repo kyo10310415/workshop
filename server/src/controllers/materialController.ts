@@ -22,7 +22,7 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
 
     const material = await prisma.material.create({
       data: {
-        workshopId: parseInt(workshopId),
+        workshopId: parseInt(workshopId as string),
         title: title || file.originalname,
         filename,
         originalName: file.originalname,
@@ -44,7 +44,7 @@ export const getMaterial = async (req: AuthRequest, res: Response) => {
     const { materialId } = req.params;
 
     const material = await prisma.material.findUnique({
-      where: { id: parseInt(materialId) },
+      where: { id: parseInt(materialId as string) },
       include: { workshop: true }
     });
 
@@ -79,7 +79,7 @@ export const deleteMaterial = async (req: AuthRequest, res: Response) => {
     const { materialId } = req.params;
 
     const material = await prisma.material.findUnique({
-      where: { id: parseInt(materialId) }
+      where: { id: parseInt(materialId as string) }
     });
 
     if (!material) {
@@ -88,7 +88,7 @@ export const deleteMaterial = async (req: AuthRequest, res: Response) => {
 
     await storageService.deleteFile(material.filename);
     await prisma.material.delete({
-      where: { id: parseInt(materialId) }
+      where: { id: parseInt(materialId as string) }
     });
 
     return res.json({ message: 'Material deleted successfully' });
