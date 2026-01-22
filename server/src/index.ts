@@ -34,7 +34,17 @@ app.use('/api/admin/users', userRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      FRONTEND_URL: process.env.FRONTEND_URL,
+      HAS_JWT_SECRET: !!process.env.JWT_SECRET,
+      HAS_DATABASE_URL: !!process.env.DATABASE_URL
+    }
+  });
 });
 
 // Serve static files from React app in production
