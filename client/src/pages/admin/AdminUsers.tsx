@@ -29,7 +29,7 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     try {
       const response = await api.get('/admin/users');
-      setUsers(response.data);
+      setUsers(response.data.users || []);
     } catch (err: any) {
       setError(err.response?.data?.error || 'ユーザーの取得に失敗しました');
     } finally {

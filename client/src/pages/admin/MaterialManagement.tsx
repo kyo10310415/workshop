@@ -29,7 +29,7 @@ export default function MaterialManagement() {
   const fetchMaterials = async () => {
     try {
       const response = await api.get(`/workshops/${id}`);
-      setMaterials(response.data.materials || []);
+      setMaterials(response.data.workshop?.materials || []);
     } catch (err: any) {
       setError(err.response?.data?.error || '資料の取得に失敗しました');
     }

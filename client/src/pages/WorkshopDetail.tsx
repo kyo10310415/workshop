@@ -44,7 +44,7 @@ export default function WorkshopDetail() {
   const fetchWorkshopDetail = async () => {
     try {
       const response = await api.get(`/workshops/${id}`);
-      setWorkshop(response.data);
+      setWorkshop(response.data.workshop);
     } catch (err: any) {
       setError(err.response?.data?.error || 'ワークショップの取得に失敗しました');
     } finally {
@@ -55,7 +55,7 @@ export default function WorkshopDetail() {
   const fetchProgress = async () => {
     try {
       const response = await api.get(`/workshops/${id}/progress`);
-      setProgress(response.data);
+      setProgress(response.data.progress);
     } catch (err) {
       // Progress not found is OK
     }

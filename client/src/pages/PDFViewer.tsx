@@ -39,7 +39,7 @@ export default function PDFViewer() {
     try {
       // 資料情報を取得
       const workshopResponse = await api.get(`/workshops/${workshopId}`);
-      const mat = workshopResponse.data.materials?.find(
+      const mat = workshopResponse.data.workshop?.materials?.find(
         (m: any) => m.id === parseInt(materialId!)
       );
       setMaterial(mat);
@@ -62,9 +62,9 @@ export default function PDFViewer() {
   const loadProgress = async () => {
     try {
       const response = await api.get(`/workshops/${workshopId}/progress`);
-      setProgress(response.data);
-      if (response.data.lastPage) {
-        setCurrentPage(response.data.lastPage);
+      setProgress(response.data.progress);
+      if (response.data.progress?.lastPage) {
+        setCurrentPage(response.data.progress.lastPage);
       }
     } catch (err) {
       // Progress not found is OK

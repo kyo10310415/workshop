@@ -26,7 +26,7 @@ export default function Workshops() {
   const fetchWorkshops = async () => {
     try {
       const response = await api.get('/workshops');
-      setWorkshops(response.data);
+      setWorkshops(response.data.workshops || []);
     } catch (err: any) {
       setError(err.response?.data?.error || 'ワークショップの取得に失敗しました');
     } finally {
