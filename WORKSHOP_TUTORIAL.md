@@ -103,9 +103,9 @@ Gensparkとの連携をスムーズにするため、Personal Access Token（PAT
 
 ## AIデベロッパーでプロジェクト作成
 
-### 1. 改良版プロンプト
+### 1. 改良版プロンプト（2026年1月最新版）
 
-以下のプロンプトをAIデベロッパーに送信してください。このプロンプトは、初回の開発で発生した問題を考慮して改良されています。
+以下のプロンプトをAIデベロッパーに送信してください。このプロンプトは、実際の開発で発生した問題を全て解決した最終版です。
 
 ```
 ワークショップ管理システムを作成してください。
@@ -126,6 +126,9 @@ PDF資料を用いたワークショップ（レッスン）を管理するシ�
 2. Express 5では app.get('/*', ...) ではなくミドルウェア形式でSPAルーティングを実装
 3. すべてのAPIレスポンスは { data: ... } 形式で統一
 4. フロントエンドはAPIレスポンスから response.data.xxx で取得
+5. **ルートの重複マウント**: /api/workshops と /api/admin/workshops の両方にworkshopRoutesをマウント
+6. **ルートの重複マウント**: /api と /api/admin の両方にmaterialRoutesをマウント
+7. **Multerフィールド名**: PDFアップロードのフィールド名は必ず 'pdf' にする（'file'は不可）
 
 【役割と権限】
 - Admin: ワークショップ作成・編集・削除、PDF管理、ユーザー管理
@@ -144,7 +147,7 @@ PDF資料を用いたワークショップ（レッスン）を管理するシ�
    - 詳細: 説明・資料一覧・自分の進行度を表示
 
 3. PDF資料管理
-   - adminがPDFをアップロード（Multer）
+   - adminがPDFをアップロード（Multer with field name 'pdf'）
    - ワークショップに紐づけ
    - ローカルストレージに保存（uploads/ディレクトリ）
    - 将来的に外部ストレージ（Cloudflare R2など）への切替を考慮した抽象化
@@ -186,7 +189,7 @@ PDF資料を用いたワークショップ（レッスン）を管理するシ�
 - DELETE /api/admin/workshops/:id → { success: true }
 
 資料:
-- POST /api/admin/workshops/:id/materials (multipart) → { material: {...} }
+- POST /api/admin/workshops/:id/materials (multipart, field='pdf') → { material: {...} }
 - GET /api/materials/:materialId → PDFファイル（バイナリ）
 - DELETE /api/admin/materials/:id → { success: true }
 
@@ -224,6 +227,51 @@ Environment Variables:
 - PORT: 10000
 - FRONTEND_URL: Web ServiceのURL（例: https://xxx.onrender.com）
 
+【重要な実装ポイント】
+1. **server/src/index.ts のルート設定**:
+```typescript
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/workshops', workshopRoutes);
+app.use('/api/admin/workshops', workshopRoutes); // 管理者用ルート（重要！）
+app.use('/api', materialRoutes);
+app.use('/api/admin', materialRoutes); // 管理者用ルート（重要！）
+app.use('/api', progressRoutes);
+app.use('/api/admin/users', userRoutes);
+```
+
+2. **server/src/routes/materials.ts のMulter設定**:
+```typescript
+// フィールド名は必ず 'pdf' にする
+router.post(
+  '/workshops/:workshopId/materials',
+  authenticate,
+  requireAdmin,
+  upload.single('pdf'), // ← 'pdf'であることが重要
+  uploadMaterial
+);
+```
+
+3. **client/src/pages/admin/MaterialManagement.tsx のフォーム**:
+```tsx
+{/* フィールド名は必ず 'pdf' にする */}
+<input
+  type="file"
+  name="pdf"  {/* ← 'pdf'であることが重要。'file'は不可 */}
+  accept="application/pdf"
+  required
+/>
+```
+
+4. **UI/UXデザインガイドライン**:
+- YouTube Clipperのようなシンプルで洗練されたデザイン
+- Navbar: コンパクト（h-14）、白背景、小さいロゴ（6x6）
+- ボタン: 単色インディゴ（gradientなし）、適度なpadding（px-4 py-2）
+- フォント: 小さめ（text-2xl以下）、読みやすく
+- 影: 控えめ（shadow-sm）または なし
+- 配色: インディゴ統一（indigo-600）
+- 背景: bg-gray-50（明るいグレー）
+
 【開発手順】
 1. プロジェクト構造作成（/server, /client）
 2. Git初期化と.gitignore設定
@@ -241,6 +289,7 @@ Environment Variables:
 - CORS設定
 - セキュリティ（SQLインジェクション対策、XSS対策）
 - レスポンシブデザイン（Tailwind CSS）
+- シンプルで洗練されたUI（YouTube Clipperスタイル）
 - 包括的なREADME
 
 【期待成果】
@@ -248,6 +297,7 @@ Environment Variables:
 - Renderへのデプロイ手順書
 - 初回アクセス時に動作するシステム
 - 管理者とユーザーの両方の機能が動作
+- PDFアップロードとワークショップ作成が正常に動作
 
 【注意事項】
 1. すべてのAPIレスポンスは必ず { data: ... } 形式でラップする
@@ -256,6 +306,9 @@ Environment Variables:
 4. Prisma 6を使用し、Prisma 7は避ける
 5. 環境変数はRenderのEnvironmentタブで設定する
 6. FRONTEND_URLは必ず正確なURLを設定する（例: https://project-name-xxxx.onrender.com）
+7. **重要**: /api/admin/workshops と /api/admin のルートマウントを忘れずに
+8. **重要**: Multerのフィールド名とフォームのname属性を必ず 'pdf' で統一
+9. UIは大きく派手にせず、YouTube Clipperのようにシンプルで機能的に
 ```
 
 ### 2. プロンプト送信と開発の進行
