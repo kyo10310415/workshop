@@ -115,7 +115,7 @@ export default function MaterialManagement() {
               </label>
               <input
                 type="file"
-                name="file"
+                name="pdf"
                 accept="application/pdf"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
