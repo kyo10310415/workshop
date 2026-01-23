@@ -28,6 +28,7 @@ app.use(cookieParser());
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/workshops', workshopRoutes);
+app.use('/api/admin/workshops', workshopRoutes); // Admin workshop routes
 app.use('/api', materialRoutes);
 app.use('/api', progressRoutes);
 app.use('/api/admin/users', userRoutes);
