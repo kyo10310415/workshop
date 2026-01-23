@@ -44,9 +44,15 @@ export default function PDFViewer() {
       );
       setMaterial(mat);
 
-      // PDFを取得
-      const pdfUrl = `/api/materials/${materialId}`;
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
+      // PDFをBlob形式で取得
+      const response = await api.get(`/materials/${materialId}`, {
+        responseType: 'blob'
+      });
+      
+      // BlobをArrayBufferに変換してPDF.jsに渡す
+      const blob = response.data;
+      const arrayBuffer = await blob.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
       const pdf = await loadingTask.promise;
       
       setPdfDoc(pdf);
