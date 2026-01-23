@@ -30,6 +30,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/workshops', workshopRoutes);
 app.use('/api/admin/workshops', workshopRoutes); // Admin workshop routes
 app.use('/api', materialRoutes);
+app.use('/api/admin', materialRoutes); // Admin material routes (for /api/admin/workshops/:id/materials)
 app.use('/api', progressRoutes);
 app.use('/api/admin/users', userRoutes);
 
