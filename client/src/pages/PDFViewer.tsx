@@ -4,8 +4,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 import api from '../api';
 import Layout from '../components/Layout';
 
-// PDF.js worker の設定
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// PDF.js worker の設定（unpkg CDNを使用）
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
 export default function PDFViewer() {
   const { workshopId, materialId } = useParams<{ workshopId: string; materialId: string }>();
