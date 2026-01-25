@@ -15,7 +15,7 @@ export default function PDFViewer() {
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [scale, setScale] = useState(1.5);
+  const [scale, setScale] = useState(1.2);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [material, setMaterial] = useState<any>(null);
@@ -237,7 +237,9 @@ export default function PDFViewer() {
 
         {/* PDF Canvas */}
         <div className="bg-white rounded-lg shadow p-4 flex justify-center overflow-auto">
-          <canvas ref={canvasRef} className="border border-gray-300" />
+          <div className="max-w-full">
+            <canvas ref={canvasRef} className="border border-gray-300 max-w-full h-auto" style={{ maxWidth: '100%' }} />
+          </div>
         </div>
       </div>
     </Layout>

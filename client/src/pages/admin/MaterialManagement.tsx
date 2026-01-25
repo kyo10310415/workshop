@@ -79,12 +79,26 @@ export default function MaterialManagement() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => navigate('/admin/workshops')}
-          className="text-blue-600 hover:text-blue-800 mb-4"
-        >
-          ← ワークショップ管理に戻る
-        </button>
+        <div className="mb-6 space-y-2">
+          <button
+            onClick={() => navigate('/workshops')}
+            className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            トップページに戻る
+          </button>
+          <button
+            onClick={() => navigate('/admin/workshops')}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            ワークショップ管理に戻る
+          </button>
+        </div>
 
         <h1 className="text-3xl font-bold text-gray-800 mb-6">PDF資料管理</h1>
 

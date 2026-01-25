@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import Layout from '../../components/Layout';
 
@@ -11,6 +12,7 @@ interface User {
 }
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -72,14 +74,25 @@ export default function AdminUsers() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">ユーザー管理</h1>
+        <div className="mb-6">
           <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={() => navigate('/workshops')}
+            className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1 mb-4"
           >
-            {showCreateForm ? 'キャンセル' : 'ユーザー作成'}
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            トップページに戻る
           </button>
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-800">ユーザー管理</h1>
+            <button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              {showCreateForm ? 'キャンセル' : 'ユーザー作成'}
+            </button>
+          </div>
         </div>
 
         {error && (
