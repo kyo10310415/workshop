@@ -47,11 +47,18 @@ export default function Workshops() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header Section */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-800 mb-3">🔗 システムリンク一覧</h1>
-          <p className="text-gray-600">各システムへアクセスするには、下のボタンをクリックしてください。</p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-800">ワークショップ一覧</h1>
+          </div>
+          <p className="text-gray-600 pl-13">各ワークショップにアクセスするには、下のボタンをクリックしてください。</p>
         </div>
 
         {error && (
@@ -79,40 +86,40 @@ export default function Workshops() {
               <button
                 key={workshop.id}
                 onClick={() => navigate(`/workshops/${workshop.id}`)}
-                className="group relative bg-gradient-to-br from-purple-500 via-purple-600 to-blue-500 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] text-left overflow-hidden"
+                className="group bg-gradient-to-br from-purple-500 via-purple-600 to-blue-500 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-left relative overflow-hidden"
               >
-                {/* Background pattern */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+                {/* Background decoration circles */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -mr-12 -mt-12"></div>
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-white opacity-10 rounded-full -ml-8 -mb-8"></div>
                 
                 <div className="relative z-10">
-                  {/* Icon */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                  {/* Icon and Badge Row */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                       </svg>
                     </div>
                     {workshop.isPublic && (
-                      <span className="px-3 py-1 bg-white bg-opacity-90 text-purple-600 rounded-full text-xs font-bold">
-                        リーダー以上
+                      <span className="px-3 py-1 bg-white text-purple-700 rounded-full text-xs font-bold">
+                        グループ以上
                       </span>
                     )}
                   </div>
                   
                   {/* Title */}
-                  <h3 className="text-2xl font-bold text-white mb-3 group-hover:translate-x-1 transition-transform">
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:translate-x-1 transition-transform">
                     {workshop.title}
                   </h3>
                   
                   {/* Description */}
-                  <p className="text-white text-opacity-90 mb-4 line-clamp-2">
+                  <p className="text-white text-opacity-90 text-sm mb-4 line-clamp-2">
                     {workshop.description || '説明なし'}
                   </p>
                   
-                  {/* Arrow */}
+                  {/* Arrow Icon */}
                   <div className="flex items-center justify-end">
-                    <svg className="w-6 h-6 text-white group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-white group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>

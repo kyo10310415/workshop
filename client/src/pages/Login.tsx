@@ -33,16 +33,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-blue-600">
-      <div className="bg-white p-12 rounded-3xl shadow-2xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-12 rounded-2xl shadow-lg w-full max-w-md border border-gray-200">
         <div className="text-center mb-10">
-          <div className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-            <svg className="w-14 h-14 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mx-auto w-20 h-20 bg-white border-2 border-gray-800 rounded-lg flex items-center justify-center mb-6 shadow-sm">
+            <svg className="w-12 h-12 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
             </svg>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            WannaV Dashboard
+            ワークショップ管理
           </h2>
           <p className="text-gray-600">アカウントにログイン</p>
         </div>
@@ -106,7 +106,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 px-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-blue-600 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-xl"
+            className="w-full bg-purple-600 text-white py-4 px-4 rounded-lg font-bold text-lg hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
           >
             {loading ? (
               <span className="flex items-center justify-center">
