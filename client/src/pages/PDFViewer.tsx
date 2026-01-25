@@ -39,14 +39,8 @@ export default function PDFViewer() {
     try {
       // 資料情報を取得
       const workshopResponse = await api.get(`/workshops/${workshopId}`);
-      console.log('Workshop response:', workshopResponse.data);
-      
       const materials = workshopResponse.data.workshop?.materials || [];
-      console.log('Available materials:', materials);
-      console.log('Looking for material ID:', materialId);
-      
       const mat = materials.find((m: any) => m.id === parseInt(materialId!));
-      console.log('Found material:', mat);
       
       if (!mat) {
         setError(`資料ID ${materialId} が見つかりません`);
@@ -57,11 +51,9 @@ export default function PDFViewer() {
       setMaterial(mat);
 
       // PDFをBlob形式で取得
-      console.log('Fetching PDF from /materials/' + materialId);
       const response = await api.get(`/materials/${materialId}`, {
         responseType: 'blob'
       });
-      console.log('PDF response:', response);
       
       // BlobをArrayBufferに変換してPDF.jsに渡す
       const blob = response.data;
@@ -74,7 +66,6 @@ export default function PDFViewer() {
       setLoading(false);
     } catch (err: any) {
       console.error('PDF loading error:', err);
-      console.error('Error response:', err.response);
       setError(`PDFの読み込みに失敗しました: ${err.response?.status || err.message}`);
       setLoading(false);
     }
