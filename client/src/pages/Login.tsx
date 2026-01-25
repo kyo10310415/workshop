@@ -33,18 +33,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-12 rounded-2xl shadow-lg w-full max-w-md border border-gray-200">
-        <div className="text-center mb-10">
-          <div className="mx-auto w-20 h-20 bg-white border-2 border-gray-800 rounded-lg flex items-center justify-center mb-6 shadow-sm">
-            <svg className="w-12 h-12 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-10 rounded-xl shadow-md w-full max-w-md border border-gray-200">
+        <div className="text-center mb-8">
+          <div className="mx-auto w-24 h-24 bg-gray-700 rounded-md flex items-center justify-center mb-5 shadow-sm">
+            <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            ワークショップ管理
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            ワークショップ管理システム
           </h2>
-          <p className="text-gray-600">アカウントにログイン</p>
+          <p className="text-sm text-gray-600">アカウントにログイン</p>
         </div>
         
         {error && (
@@ -60,7 +60,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               メールアドレス
             </label>
             <div className="relative">
@@ -73,7 +73,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                 placeholder="admin@example.com"
                 required
                 autoComplete="email"
@@ -82,7 +82,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               パスワード
             </label>
             <div className="relative">
@@ -95,7 +95,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                 placeholder="••••••••"
                 required
                 autoComplete="current-password"
@@ -106,7 +106,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 text-white py-4 px-4 rounded-lg font-bold text-lg hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
+            className="w-full bg-purple-600 text-white py-3 px-4 rounded-md font-semibold text-base hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
           >
             {loading ? (
               <span className="flex items-center justify-center">
