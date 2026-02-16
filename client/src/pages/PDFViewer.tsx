@@ -135,33 +135,28 @@ export default function PDFViewer() {
       // テキストコンテンツを取得
       const textContent = await page.getTextContent();
       
-      // テキストレイヤーをレンダリング（PDF.jsの仕様に準拠）
+      // テキストレイヤーをレンダリング（簡易版）
       const textItems = textContent.items;
       textItems.forEach((item: any) => {
-        // PDF.jsの変換行列を適用
         const tx = pdfjsLib.Util.transform(
           viewport.transform,
           item.transform
         );
         
-        const div = document.createElement('div');
-        div.textContent = item.str;
-        div.style.position = 'absolute';
-        div.style.left = `${tx[4]}px`;
-        // PDF座標系はY軸が下向きなので調整
-        div.style.top = `${tx[5] - (tx[0] || tx[3])}px`;
-        div.style.fontSize = `${Math.abs(tx[3])}px`;
-        div.style.fontFamily = item.fontName || 'sans-serif';
-        div.style.whiteSpace = 'pre';
-        div.style.transformOrigin = 'left bottom';
+        const span = document.createElement('span');
+        span.textContent = item.str;
+        span.style.position = 'absolute';
+        span.style.left = `${tx[4]}px`;
+        span.style.top = `${tx[5]}px`;
+        span.style.fontSize = `${Math.sqrt(tx[0] * tx[0] + tx[3] * tx[3])}px`;
+        span.style.fontFamily = 'sans-serif';
+        span.style.whiteSpace = 'pre';
+        span.style.transform = `scaleX(${tx[0] / Math.sqrt(tx[0] * tx[0] + tx[3] * tx[3])})`;
+        span.style.transformOrigin = 'left bottom';
+        span.style.color = 'transparent';
+        span.style.pointerEvents = 'auto';
         
-        // 横書き/縦書き対応
-        if (tx[0] !== 0 || tx[1] !== 0) {
-          const angle = Math.atan2(tx[1], tx[0]);
-          div.style.transform = `rotate(${angle}rad) scale(${tx[0] / Math.abs(tx[3])}, 1)`;
-        }
-        
-        textLayer.appendChild(div);
+        textLayer.appendChild(span);
       });
     } catch (err) {
       console.error('Page render error:', err);
@@ -299,14 +294,15 @@ export default function PDFViewer() {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  right: 0,
-                  bottom: 0,
+                  width: '100%',
+                  height: '100%',
                   overflow: 'hidden',
-                  opacity: 0,
+                  opacity: 1,
                   lineHeight: 1,
                   pointerEvents: 'auto',
                   userSelect: 'text',
-                  cursor: 'text'
+                  cursor: 'text',
+                  mixBlendMode: 'multiply'
                 }}
                 className="text-layer"
               />
