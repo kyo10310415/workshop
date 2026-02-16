@@ -11,6 +11,8 @@ export default function PDFViewer() {
   const { workshopId, materialId } = useParams<{ workshopId: string; materialId: string }>();
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const textLayerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,7 +108,7 @@ export default function PDFViewer() {
   };
 
   const renderPage = async (pageNum: number) => {
-    if (!pdfDoc || !canvasRef.current) return;
+    if (!pdfDoc || !canvasRef.current || !textLayerRef.current) return;
 
     try {
       const page = await pdfDoc.getPage(pageNum);
@@ -117,12 +119,46 @@ export default function PDFViewer() {
       canvas.height = viewport.height;
       canvas.width = viewport.width;
 
+      // Canvas レンダリング
       const renderContext = {
         canvasContext: context,
         viewport: viewport,
       };
-
       await page.render(renderContext).promise;
+
+      // テキストレイヤーのクリア
+      const textLayer = textLayerRef.current;
+      textLayer.innerHTML = '';
+      textLayer.style.width = `${viewport.width}px`;
+      textLayer.style.height = `${viewport.height}px`;
+
+      // テキストコンテンツを取得
+      const textContent = await page.getTextContent();
+      
+      // テキストレイヤーをレンダリング
+      const textItems = textContent.items;
+      textItems.forEach((item: any) => {
+        const tx = pdfjsLib.Util.transform(
+          viewport.transform,
+          item.transform
+        );
+        
+        const span = document.createElement('span');
+        span.textContent = item.str;
+        span.style.position = 'absolute';
+        span.style.left = `${tx[4]}px`;
+        span.style.top = `${tx[5]}px`;
+        span.style.fontSize = `${Math.sqrt(tx[0] * tx[0] + tx[1] * tx[1])}px`;
+        span.style.fontFamily = item.fontName || 'sans-serif';
+        span.style.whiteSpace = 'pre';
+        span.style.transformOrigin = '0% 0%';
+        
+        // 回転とスケールの適用
+        const angle = Math.atan2(tx[1], tx[0]);
+        span.style.transform = `rotate(${angle}rad)`;
+        
+        textLayer.appendChild(span);
+      });
     } catch (err) {
       console.error('Page render error:', err);
     }
@@ -194,7 +230,7 @@ export default function PDFViewer() {
 
         {/* コントロールバー */}
         <div className="bg-white rounded-lg shadow p-4 mb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-2">
               <button
                 onClick={goToPrevPage}
@@ -215,30 +251,62 @@ export default function PDFViewer() {
               </button>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={zoomOut}
-                className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
-              >
-                -
-              </button>
-              <span className="px-4 py-2 bg-gray-100 rounded">
-                {Math.round(scale * 100)}%
-              </span>
-              <button
-                onClick={zoomIn}
-                className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
-              >
-                +
-              </button>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={zoomOut}
+                  className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
+                >
+                  -
+                </button>
+                <span className="px-4 py-2 bg-gray-100 rounded">
+                  {Math.round(scale * 100)}%
+                </span>
+                <button
+                  onClick={zoomIn}
+                  className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
+                >
+                  +
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>テキストを選択してコピーできます</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* PDF Canvas */}
+        {/* PDF Canvas with Text Layer */}
         <div className="bg-white rounded-lg shadow p-4 flex justify-center overflow-auto">
-          <div className="max-w-full">
-            <canvas ref={canvasRef} className="border border-gray-300 max-w-full h-auto" style={{ maxWidth: '100%' }} />
+          <div className="max-w-full" ref={containerRef}>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <canvas 
+                ref={canvasRef} 
+                className="border border-gray-300" 
+                style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+              />
+              <div 
+                ref={textLayerRef}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  overflow: 'hidden',
+                  opacity: 0.2,
+                  lineHeight: 1,
+                  pointerEvents: 'auto',
+                  userSelect: 'text',
+                  cursor: 'text'
+                }}
+                className="text-layer"
+              />
+            </div>
           </div>
         </div>
       </div>
