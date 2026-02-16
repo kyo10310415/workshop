@@ -46,7 +46,7 @@ export default function WorkshopDetail() {
       const response = await api.get(`/workshops/${id}`);
       setWorkshop(response.data.workshop);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'ワークショップの取得に失敗しました');
+      setError(err.response?.data?.error || 'eラーニングの取得に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export default function WorkshopDetail() {
     return (
       <Layout>
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error || 'ワークショップが見つかりません'}
+          {error || 'eラーニングが見つかりません'}
         </div>
       </Layout>
     );

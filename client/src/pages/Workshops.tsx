@@ -26,7 +26,7 @@ export default function Workshops() {
       const response = await api.get('/workshops');
       setWorkshops(response.data.workshops || []);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'ワークショップの取得に失敗しました');
+      setError(err.response?.data?.error || 'eラーニングの取得に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -54,9 +54,9 @@ export default function Workshops() {
             <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
-            <h1 className="text-xl font-bold text-gray-800">ワークショップ一覧</h1>
+            <h1 className="text-xl font-bold text-gray-800">eラーニング一覧</h1>
           </div>
-          <p className="text-sm text-gray-600">各ワークショップにアクセスするには、下のボタンをクリックしてください。</p>
+          <p className="text-sm text-gray-600">各eラーニングにアクセスするには、下のボタンをクリックしてください。</p>
         </div>
 
         {error && (
@@ -70,8 +70,8 @@ export default function Workshops() {
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-base text-gray-700 font-semibold mb-1">ワークショップがまだありません</p>
-            <p className="text-sm text-gray-500">管理者が新しいワークショップを公開するまでお待ちください</p>
+            <p className="text-base text-gray-700 font-semibold mb-1">eラーニングがまだありません</p>
+            <p className="text-sm text-gray-500">管理者が新しいeラーニングを公開するまでお待ちください</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -32,7 +32,7 @@ export default function AdminWorkshops() {
       const response = await api.get('/workshops');
       setWorkshops(response.data.workshops || []);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'ワークショップの取得に失敗しました');
+      setError(err.response?.data?.error || 'eラーニングの取得に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -103,8 +103,8 @@ export default function AdminWorkshops() {
           </div>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">ワークショップ管理</h1>
-              <p className="text-sm text-gray-600 mt-1">ワークショップの作成・編集・削除を行います</p>
+              <h1 className="text-2xl font-bold text-gray-900">eラーニング管理</h1>
+              <p className="text-sm text-gray-600 mt-1">eラーニングの作成・編集・削除を行います</p>
             </div>
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
@@ -129,7 +129,7 @@ export default function AdminWorkshops() {
 
         {showCreateForm && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900">新規ワークショップ作成</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-900">新規eラーニング作成</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -140,7 +140,7 @@ export default function AdminWorkshops() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="例: GensparkでWebアプリを作る"
+                  placeholder="例: React入門コース"
                   required
                 />
               </div>
@@ -152,7 +152,7 @@ export default function AdminWorkshops() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="GensparkのAIデベロッパーを使用してワークショップ管理システムを構築する方法を学びます"
+                  placeholder="Reactの基礎から実践的な開発までを学びます"
                   rows={3}
                 />
               </div>
@@ -165,7 +165,7 @@ export default function AdminWorkshops() {
                   className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                 />
                 <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700">
-                  公開する（ユーザーがこのワークショップを閲覧できます）
+                  公開する（ユーザーがこのeラーニングを閲覧できます）
                 </label>
               </div>
               <div className="flex justify-end pt-2">
@@ -202,8 +202,8 @@ export default function AdminWorkshops() {
               <svg className="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p className="text-gray-600 mb-1">ワークショップがまだありません</p>
-              <p className="text-sm text-gray-500">「新規作成」ボタンで最初のワークショップを作成しましょう</p>
+              <p className="text-gray-600 mb-1">eラーニングがまだありません</p>
+              <p className="text-sm text-gray-500">「新規作成」ボタンで最初のeラーニングを作成しましょう</p>
             </div>
           ) : (
           <table className="min-w-full divide-y divide-gray-200">

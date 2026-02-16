@@ -22,7 +22,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-white text-base">ワークショップ管理システム</span>
+              <span className="font-bold text-white text-base">eラーニング管理システム</span>
             </div>
 
           </div>

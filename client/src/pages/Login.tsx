@@ -42,7 +42,7 @@ export default function Login() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            ワークショップ管理システム
+            eラーニング管理システム
           </h2>
           <p className="text-sm text-gray-600">アカウントにログイン</p>
         </div>
