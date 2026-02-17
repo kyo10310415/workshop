@@ -3,12 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import Layout from '../components/Layout';
 
+interface Material {
+  id: number;
+  title: string;
+  pageCount: number;
+  type: 'PDF' | 'GOOGLE_DOCS' | 'GOOGLE_SHEETS';
+}
+
+interface Progress {
+  materialId: number | null;
+  lastPage: number;
+  completed: boolean;
+}
+
 interface Workshop {
   id: number;
   title: string;
   description: string | null;
   isPublic: boolean;
   createdAt: string;
+  materials: Material[];
+  progresses: Progress[];
 }
 
 export default function Workshops() {
@@ -30,6 +45,19 @@ export default function Workshops() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateOverallProgress = (workshop: Workshop) => {
+    if (!workshop.materials || workshop.materials.length === 0) {
+      return { completed: 0, total: 0, percentage: 0, allCompleted: false };
+    }
+
+    const totalMaterials = workshop.materials.length;
+    const completedMaterials = workshop.progresses?.filter(p => p.completed).length || 0;
+    const percentage = Math.round((completedMaterials / totalMaterials) * 100);
+    const allCompleted = completedMaterials === totalMaterials;
+
+    return { completed: completedMaterials, total: totalMaterials, percentage, allCompleted };
   };
 
   if (loading) {
@@ -75,42 +103,68 @@ export default function Workshops() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {workshops.map((workshop) => (
-              <button
-                key={workshop.id}
-                onClick={() => navigate(`/workshops/${workshop.id}`)}
-                className="group bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg p-5 shadow-md hover:shadow-lg transition-all duration-200 text-left relative overflow-hidden"
-              >
-                <div className="relative z-10">
-                  {/* Icon and Badge Row */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+            {workshops.map((workshop) => {
+              const progress = calculateOverallProgress(workshop);
+              return (
+                <button
+                  key={workshop.id}
+                  onClick={() => navigate(`/workshops/${workshop.id}`)}
+                  className="group bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg p-5 shadow-md hover:shadow-lg transition-all duration-200 text-left relative overflow-hidden"
+                >
+                  <div className="relative z-10">
+                    {/* Icon and Badge Row */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                        </svg>
+                        {workshop.isPublic && (
+                          <span className="px-2 py-0.5 bg-white text-purple-700 rounded-full text-xs font-semibold">
+                            グループ以上
+                          </span>
+                        )}
+                        {progress.allCompleted && (
+                          <span className="px-2 py-0.5 bg-green-500 text-white rounded-full text-xs font-semibold">
+                            ✓ 完了
+                          </span>
+                        )}
+                      </div>
+                      <svg className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                       </svg>
-                      {workshop.isPublic && (
-                        <span className="px-2 py-0.5 bg-white text-purple-700 rounded-full text-xs font-semibold">
-                          グループ以上
-                        </span>
-                      )}
                     </div>
-                    <svg className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
+                    
+                    {/* Title */}
+                    <h3 className="text-base font-bold text-white mb-2">
+                      {workshop.title}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-white text-opacity-90 text-sm line-clamp-2 mb-3">
+                      {workshop.description || '説明なし'}
+                    </p>
+
+                    {/* Progress Bar */}
+                    {progress.total > 0 && (
+                      <div className="mt-3 bg-white bg-opacity-20 rounded-lg p-2">
+                        <div className="flex justify-between text-xs text-white mb-1">
+                          <span>進捗状況</span>
+                          <span className="font-semibold">{progress.completed} / {progress.total} 資料</span>
+                        </div>
+                        <div className="w-full bg-white bg-opacity-30 rounded-full h-2 overflow-hidden">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              progress.allCompleted ? 'bg-green-400' : 'bg-blue-400'
+                            }`}
+                            style={{ width: `${progress.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-white mb-2">
-                    {workshop.title}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-white text-opacity-90 text-sm line-clamp-2">
-                    {workshop.description || '説明なし'}
-                  </p>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

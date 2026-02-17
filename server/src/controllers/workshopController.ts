@@ -5,12 +5,17 @@ import { AuthRequest } from '../middlewares/auth';
 export const getWorkshops = async (req: AuthRequest, res: Response) => {
   try {
     const isAdmin = req.user?.role === 'ADMIN';
+    const userId = req.user!.id;
 
     const workshops = await prisma.workshop.findMany({
       where: isAdmin ? {} : { isPublic: true },
       include: {
         materials: {
-          select: { id: true, title: true, pageCount: true }
+          select: { id: true, title: true, pageCount: true, type: true, url: true }
+        },
+        progresses: {
+          where: { userId },
+          select: { materialId: true, lastPage: true, completed: true }
         },
         _count: {
           select: { materials: true }
@@ -30,6 +35,7 @@ export const getWorkshopById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const isAdmin = req.user?.role === 'ADMIN';
+    const userId = req.user!.id;
 
     const workshop = await prisma.workshop.findUnique({
       where: { id: parseInt(id as string) },
@@ -38,13 +44,19 @@ export const getWorkshopById = async (req: AuthRequest, res: Response) => {
           select: {
             id: true,
             title: true,
+            type: true,
             filename: true,
             originalName: true,
             fileSize: true,
             pageCount: true,
+            url: true,
             createdAt: true
           },
           orderBy: { createdAt: 'asc' }
+        },
+        progresses: {
+          where: { userId },
+          select: { materialId: true, lastPage: true, completed: true }
         }
       }
     });

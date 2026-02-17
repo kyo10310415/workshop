@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import {
   uploadMaterial,
+  createUrlMaterial,
   getMaterial,
   deleteMaterial
 } from '../controllers/materialController';
@@ -24,6 +25,13 @@ router.post(
   requireAdmin,
   upload.single('pdf'),
   uploadMaterial
+);
+
+router.post(
+  '/workshops/:workshopId/materials/url',
+  authenticate,
+  requireAdmin,
+  createUrlMaterial
 );
 
 router.delete(

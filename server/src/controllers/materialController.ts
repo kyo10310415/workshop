@@ -24,6 +24,7 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
       data: {
         workshopId: parseInt(workshopId as string),
         title: title || file.originalname,
+        type: 'PDF',
         filename,
         originalName: file.originalname,
         fileSize: file.size,
@@ -35,6 +36,35 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
     return res.status(201).json({ material });
   } catch (error) {
     console.error('Upload material error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const createUrlMaterial = async (req: AuthRequest, res: Response) => {
+  try {
+    const { workshopId } = req.params;
+    const { title, url, type } = req.body;
+
+    if (!title || !url || !type) {
+      return res.status(400).json({ error: 'Title, URL, and type are required' });
+    }
+
+    if (!['GOOGLE_DOCS', 'GOOGLE_SHEETS'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid material type' });
+    }
+
+    const material = await prisma.material.create({
+      data: {
+        workshopId: parseInt(workshopId as string),
+        title,
+        type,
+        url
+      }
+    });
+
+    return res.status(201).json({ material });
+  } catch (error) {
+    console.error('Create URL material error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -57,13 +87,19 @@ export const getMaterial = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
+    // For URL-based materials, return metadata only
+    if (material.type !== 'PDF' || !material.filename) {
+      return res.json({ material });
+    }
+
+    // For PDF materials, stream the file
     const filepath = storageService.getFilePath(material.filename);
 
     if (!fs.existsSync(filepath)) {
       return res.status(404).json({ error: 'File not found' });
     }
 
-    res.setHeader('Content-Type', material.mimeType);
+    res.setHeader('Content-Type', material.mimeType || 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="${material.originalName}"`);
     
     const fileStream = fs.createReadStream(filepath);
@@ -86,7 +122,11 @@ export const deleteMaterial = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Material not found' });
     }
 
-    await storageService.deleteFile(material.filename);
+    // Delete file only for PDF materials
+    if (material.type === 'PDF' && material.filename) {
+      await storageService.deleteFile(material.filename);
+    }
+    
     await prisma.material.delete({
       where: { id: parseInt(materialId as string) }
     });

@@ -75,7 +75,9 @@ export default function PDFViewer() {
 
   const loadProgress = async () => {
     try {
-      const response = await api.get(`/workshops/${workshopId}/progress`);
+      const response = await api.get(`/workshops/${workshopId}/progress`, {
+        params: { materialId }
+      });
       setProgress(response.data.progress);
       if (response.data.progress?.lastPage) {
         setCurrentPage(response.data.progress.lastPage);
@@ -88,6 +90,7 @@ export default function PDFViewer() {
   const saveProgress = async (page: number) => {
     try {
       await api.put(`/workshops/${workshopId}/progress`, {
+        materialId: parseInt(materialId!),
         lastPage: page
       });
     } catch (err) {
@@ -99,6 +102,7 @@ export default function PDFViewer() {
     try {
       const newCompleted = !progress?.completed;
       await api.put(`/workshops/${workshopId}/progress`, {
+        materialId: parseInt(materialId!),
         completed: newCompleted
       });
       setProgress({ ...progress, completed: newCompleted });
