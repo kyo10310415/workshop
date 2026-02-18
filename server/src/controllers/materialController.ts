@@ -3,6 +3,7 @@ import prisma from '../utils/prisma';
 import { AuthRequest } from '../middlewares/auth';
 import { storageService } from '../services/storageService';
 import fs from 'fs';
+import * as pdfParse from 'pdf-parse';
 
 export const uploadMaterial = async (req: AuthRequest, res: Response) => {
   try {
@@ -20,6 +21,18 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
 
     const filename = await storageService.saveFile(file);
 
+    // Get PDF page count
+    let pageCount = 0;
+    try {
+      const dataBuffer = fs.readFileSync(file.path);
+      const pdfData = await (pdfParse as any)(dataBuffer);
+      pageCount = pdfData.numpages;
+      console.log(`PDF page count: ${pageCount}`);
+    } catch (error) {
+      console.error('Failed to parse PDF:', error);
+      // Continue with pageCount = 0 if parsing fails
+    }
+
     const material = await prisma.material.create({
       data: {
         workshopId: parseInt(workshopId as string),
@@ -29,7 +42,7 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
         originalName: file.originalname,
         fileSize: file.size,
         mimeType: file.mimetype,
-        pageCount: 0 // Will be updated by PDF processing if needed
+        pageCount
       }
     });
 

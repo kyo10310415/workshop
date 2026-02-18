@@ -10,7 +10,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "node prisma/seed.js",
-    "prisma:force-migrate": "npx prisma migrate resolve --rolled-back 20260217164224_add_material_types_and_progress_by_material || true && npx prisma migrate deploy && npx prisma generate"
+    "prisma:force-migrate": "npx prisma migrate resolve --rolled-back 20260217164224_add_material_types_and_progress_by_material || true && npx prisma migrate deploy && npx prisma generate",
+    "update-page-counts": "node dist/scripts/updatePageCounts.js"
   },
   "keywords": [],
   "author": "",
@@ -18,13 +19,15 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "6.19.2",
+    "@types/pdf-parse": "^1.1.5",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
