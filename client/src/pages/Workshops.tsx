@@ -53,9 +53,18 @@ export default function Workshops() {
     }
 
     const totalMaterials = workshop.materials.length;
-    const completedMaterials = workshop.progresses?.filter(p => p.completed).length || 0;
+    
+    // Check if we have any progresses
+    const hasProgresses = workshop.progresses && workshop.progresses.length > 0;
+    if (!hasProgresses) {
+      return { completed: 0, total: totalMaterials, percentage: 0, allCompleted: false };
+    }
+    
+    // For old schema: if any progress is completed, consider it completed
+    const hasCompletedProgress = workshop.progresses.some(p => p.completed);
+    const completedMaterials = hasCompletedProgress ? 1 : 0;
     const percentage = Math.round((completedMaterials / totalMaterials) * 100);
-    const allCompleted = completedMaterials === totalMaterials;
+    const allCompleted = hasCompletedProgress && totalMaterials === 1;
 
     return { completed: completedMaterials, total: totalMaterials, percentage, allCompleted };
   };

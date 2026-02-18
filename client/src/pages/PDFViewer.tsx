@@ -75,6 +75,7 @@ export default function PDFViewer() {
 
   const loadProgress = async () => {
     try {
+      // Try with materialId first (new schema)
       const response = await api.get(`/workshops/${workshopId}/progress`, {
         params: { materialId }
       });
@@ -83,31 +84,58 @@ export default function PDFViewer() {
         setCurrentPage(response.data.progress.lastPage);
       }
     } catch (err) {
-      // Progress not found is OK
+      // Fallback: try without materialId (old schema)
+      try {
+        const response = await api.get(`/workshops/${workshopId}/progress`);
+        setProgress(response.data.progress);
+        if (response.data.progress?.lastPage) {
+          setCurrentPage(response.data.progress.lastPage);
+        }
+      } catch (fallbackErr) {
+        console.log('No progress found, starting from page 1');
+      }
     }
   };
 
   const saveProgress = async (page: number) => {
     try {
+      // Try with materialId first (new schema)
       await api.put(`/workshops/${workshopId}/progress`, {
         materialId: parseInt(materialId!),
         lastPage: page
       });
     } catch (err) {
-      console.error('Progress save error:', err);
+      // Fallback: try without materialId (old schema)
+      try {
+        await api.put(`/workshops/${workshopId}/progress`, {
+          lastPage: page
+        });
+      } catch (fallbackErr) {
+        console.error('Progress save error:', fallbackErr);
+      }
     }
   };
 
   const toggleCompleted = async () => {
     try {
       const newCompleted = !progress?.completed;
+      // Try with materialId first (new schema)
       await api.put(`/workshops/${workshopId}/progress`, {
         materialId: parseInt(materialId!),
         completed: newCompleted
       });
       setProgress({ ...progress, completed: newCompleted });
     } catch (err: any) {
-      alert(err.response?.data?.error || '完了状態の更新に失敗しました');
+      // Fallback: try without materialId (old schema)
+      try {
+        const newCompleted = !progress?.completed;
+        await api.put(`/workshops/${workshopId}/progress`, {
+          completed: newCompleted
+        });
+        setProgress({ ...progress, completed: newCompleted });
+      } catch (fallbackErr: any) {
+        alert(fallbackErr.response?.data?.error || '完了状態の更新に失敗しました');
+      }
     }
   };
 
