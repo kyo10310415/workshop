@@ -60,11 +60,24 @@ export default function Workshops() {
       return { completed: 0, total: totalMaterials, percentage: 0, allCompleted: false };
     }
     
-    // For old schema: if any progress is completed, consider it completed
-    const hasCompletedProgress = workshop.progresses.some(p => p.completed);
-    const completedMaterials = hasCompletedProgress ? 1 : 0;
+    // Count completed materials by checking each material
+    let completedMaterials = 0;
+    workshop.materials.forEach(material => {
+      // Try to find progress by materialId (new schema)
+      const progressWithMaterial = workshop.progresses.find(p => p.materialId === material.id);
+      if (progressWithMaterial?.completed) {
+        completedMaterials++;
+      } else if (!progressWithMaterial) {
+        // Fallback: check if there's a progress without materialId (old schema)
+        const progressWithoutMaterial = workshop.progresses.find(p => !p.materialId);
+        if (progressWithoutMaterial?.completed) {
+          completedMaterials++;
+        }
+      }
+    });
+    
     const percentage = Math.round((completedMaterials / totalMaterials) * 100);
-    const allCompleted = hasCompletedProgress && totalMaterials === 1;
+    const allCompleted = completedMaterials === totalMaterials;
 
     return { completed: completedMaterials, total: totalMaterials, percentage, allCompleted };
   };

@@ -9,7 +9,7 @@ type MaterialType = 'PDF' | 'GOOGLE_DOCS' | 'GOOGLE_SHEETS';
 interface Material {
   id: number;
   title: string;
-  type: MaterialType;
+  type?: MaterialType;  // Make optional for backward compatibility
   originalName?: string;
   fileSize?: number;
   pageCount: number;
@@ -48,6 +48,9 @@ export default function WorkshopDetail() {
   const fetchWorkshopDetail = async () => {
     try {
       const response = await api.get(`/workshops/${id}`);
+      console.log('Workshop data:', response.data.workshop);
+      console.log('Materials:', response.data.workshop?.materials);
+      console.log('Progresses:', response.data.workshop?.progresses);
       setWorkshop(response.data.workshop);
     } catch (err: any) {
       setError(err.response?.data?.error || 'eラーニングの取得に失敗しました');
@@ -79,16 +82,21 @@ export default function WorkshopDetail() {
 
     const total = workshop.materials.length;
     
-    // Check if we have any progresses with completed flag
+    // Check if we have any progresses
     const hasProgresses = workshop.progresses && workshop.progresses.length > 0;
     if (!hasProgresses) {
       return { completed: 0, total, percentage: 0 };
     }
     
-    // Count completed materials
-    // For old schema: if any progress is completed, consider workshop completed
-    const hasCompletedProgress = workshop.progresses.some(p => p.completed);
-    const completed = hasCompletedProgress ? 1 : 0;
+    // Count completed materials by checking each material's progress
+    let completed = 0;
+    workshop.materials.forEach(material => {
+      const progress = getMaterialProgress(material.id);
+      if (progress?.completed) {
+        completed++;
+      }
+    });
+    
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return { completed, total, percentage };
@@ -101,7 +109,7 @@ export default function WorkshopDetail() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const getMaterialIcon = (type: MaterialType) => {
+  const getMaterialIcon = (type?: MaterialType) => {
     switch (type) {
       case 'PDF':
         return '📄';
@@ -114,7 +122,7 @@ export default function WorkshopDetail() {
     }
   };
 
-  const getMaterialTypeLabel = (type: MaterialType) => {
+  const getMaterialTypeLabel = (type?: MaterialType) => {
     switch (type) {
       case 'PDF':
         return 'PDF';
@@ -123,15 +131,17 @@ export default function WorkshopDetail() {
       case 'GOOGLE_SHEETS':
         return 'Google スプレッドシート';
       default:
-        return type;
+        return 'PDF';
     }
   };
 
   const handleMaterialClick = (material: Material) => {
-    if (material.type === 'PDF') {
+    const materialType = material.type || 'PDF';
+    if (materialType === 'PDF') {
       navigate(`/workshops/${id}/materials/${material.id}`);
-    } else if (material.url) {
-      window.open(material.url, '_blank');
+    } else {
+      // Navigate to external material viewer page
+      navigate(`/workshops/${id}/external-materials/${material.id}`);
     }
   };
 

@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Workshops from './pages/Workshops';
 import WorkshopDetail from './pages/WorkshopDetail';
 import PDFViewer from './pages/PDFViewer';
+import ExternalMaterialViewer from './pages/ExternalMaterialViewer';
 import AdminWorkshops from './pages/admin/AdminWorkshops';
 import AdminUsers from './pages/admin/AdminUsers';
 import MaterialManagement from './pages/admin/MaterialManagement';
@@ -39,6 +40,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <PDFViewer />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workshops/:workshopId/external-materials/:materialId"
+            element={
+              <ProtectedRoute>
+                <ExternalMaterialViewer />
               </ProtectedRoute>
             }
           />
