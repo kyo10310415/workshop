@@ -45,17 +45,10 @@ export default function ExternalMaterialViewer() {
 
   const loadProgress = async () => {
     try {
-      // Try new schema first
-      const response = await api.get(`/workshops/${workshopId}/progress?materialId=${materialId}`);
-      setCompleted(response.data.progress?.completed || false);
+      const response = await api.get(`/materials/${materialId}/completion`);
+      setCompleted(response.data.completion?.completed || false);
     } catch (err: any) {
-      // Fallback to old schema
-      try {
-        const response = await api.get(`/workshops/${workshopId}/progress`);
-        setCompleted(response.data.progress?.completed || false);
-      } catch (fallbackErr) {
-        console.error('Failed to load progress:', fallbackErr);
-      }
+      console.error('Failed to load completion status:', err);
     }
   };
 
@@ -69,14 +62,11 @@ export default function ExternalMaterialViewer() {
   const handleToggleCompleted = async () => {
     try {
       console.log('=== Toggle Completed Debug ===');
-      console.log('WorkshopId:', workshopId);
       console.log('MaterialId:', materialId);
       console.log('Current completed:', completed);
       console.log('New completed:', !completed);
 
-      const response = await api.put(`/workshops/${workshopId}/progress`, {
-        materialId: parseInt(materialId!),
-        lastPage: 1,
+      const response = await api.put(`/materials/${materialId}/completion`, {
         completed: !completed
       });
 
