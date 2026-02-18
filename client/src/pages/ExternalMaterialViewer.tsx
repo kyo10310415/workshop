@@ -68,23 +68,24 @@ export default function ExternalMaterialViewer() {
 
   const handleToggleCompleted = async () => {
     try {
-      // Try new schema first
-      try {
-        await api.put(`/workshops/${workshopId}/progress`, {
-          materialId: parseInt(materialId!),
-          lastPage: 1,
-          completed: !completed
-        });
-      } catch (err: any) {
-        // Fallback to old schema
-        await api.put(`/workshops/${workshopId}/progress`, {
-          lastPage: 1,
-          completed: !completed
-        });
-      }
+      console.log('=== Toggle Completed Debug ===');
+      console.log('WorkshopId:', workshopId);
+      console.log('MaterialId:', materialId);
+      console.log('Current completed:', completed);
+      console.log('New completed:', !completed);
+
+      const response = await api.put(`/workshops/${workshopId}/progress`, {
+        materialId: parseInt(materialId!),
+        lastPage: 1,
+        completed: !completed
+      });
+
+      console.log('API Response:', response.data);
       setCompleted(!completed);
     } catch (err: any) {
-      alert('完了状態の更新に失敗しました');
+      console.error('Toggle completed error:', err);
+      console.error('Error response:', err.response?.data);
+      alert(`完了状態の更新に失敗しました\n\nエラー詳細: ${err.response?.data?.details || err.response?.data?.error || err.message}`);
     }
   };
 
