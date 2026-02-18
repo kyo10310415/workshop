@@ -62,6 +62,29 @@ export const createUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: parseInt(id as string) },
+      data: { password: hashedPassword }
+    });
+
+    return res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Update password error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const deleteUser = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;

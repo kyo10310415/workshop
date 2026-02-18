@@ -11,6 +11,12 @@ interface User {
   createdAt: string;
 }
 
+interface PasswordModalState {
+  userId: number | null;
+  userName: string;
+  newPassword: string;
+}
+
 export default function AdminUsers() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
@@ -22,6 +28,11 @@ export default function AdminUsers() {
     password: '',
     name: '',
     role: 'USER' as 'USER' | 'ADMIN'
+  });
+  const [passwordModal, setPasswordModal] = useState<PasswordModalState>({
+    userId: null,
+    userName: '',
+    newPassword: ''
   });
 
   useEffect(() => {
@@ -60,6 +71,34 @@ export default function AdminUsers() {
       fetchUsers();
     } catch (err: any) {
       alert(err.response?.data?.error || 'ユーザーの削除に失敗しました');
+    }
+  };
+
+  const openPasswordModal = (userId: number, userName: string) => {
+    setPasswordModal({ userId, userName, newPassword: '' });
+  };
+
+  const closePasswordModal = () => {
+    setPasswordModal({ userId: null, userName: '', newPassword: '' });
+  };
+
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordModal.userId) return;
+
+    if (passwordModal.newPassword.length < 6) {
+      alert('パスワードは6文字以上で入力してください');
+      return;
+    }
+
+    try {
+      await api.put(`/admin/users/${passwordModal.userId}/password`, {
+        password: passwordModal.newPassword
+      });
+      alert('パスワードを更新しました');
+      closePasswordModal();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'パスワード更新に失敗しました');
     }
   };
 
@@ -217,6 +256,12 @@ export default function AdminUsers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
+                      onClick={() => openPasswordModal(user.id, user.name)}
+                      className="text-blue-600 hover:text-blue-900 mr-4"
+                    >
+                      パスワード変更
+                    </button>
+                    <button
                       onClick={() => handleDelete(user.id, user.email)}
                       className="text-red-600 hover:text-red-900"
                     >
@@ -228,6 +273,49 @@ export default function AdminUsers() {
             </tbody>
           </table>
         </div>
+
+        {/* パスワード変更モーダル */}
+        {passwordModal.userId && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold mb-4">パスワード変更</h3>
+              <p className="text-gray-600 mb-4">ユーザー: {passwordModal.userName}</p>
+              
+              <form onSubmit={handlePasswordUpdate}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    新しいパスワード(6文字以上)
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordModal.newPassword}
+                    onChange={(e) => setPasswordModal({ ...passwordModal, newPassword: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="新しいパスワードを入力"
+                    required
+                    minLength={6}
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={closePasswordModal}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    更新
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
