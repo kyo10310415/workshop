@@ -36,12 +36,20 @@ export default function Navbar() {
               </span>
             )}
             {isAdmin && (
-              <button
-                onClick={() => navigate('/admin/workshops')}
-                className="text-xs font-medium text-white hover:text-gray-200 transition-all"
-              >
-                ⚙️ 管理
-              </button>
+              <>
+                <button
+                  onClick={() => navigate('/admin/workshops')}
+                  className="text-xs font-medium text-white hover:text-gray-200 transition-all"
+                >
+                  ⚙️ eラーニング管理
+                </button>
+                <button
+                  onClick={() => navigate('/admin/users')}
+                  className="text-xs font-medium text-white hover:text-gray-200 transition-all"
+                >
+                  👥 ユーザー管理
+                </button>
+              </>
             )}
             <button
               onClick={handleLogout}

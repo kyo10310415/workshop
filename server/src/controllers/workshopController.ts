@@ -10,12 +10,9 @@ export const getWorkshops = async (req: AuthRequest, res: Response) => {
     const workshops = await prisma.workshop.findMany({
       where: isAdmin ? {} : { isPublic: true },
       include: {
-        materials: {
-          select: { id: true, title: true, pageCount: true, type: true, url: true }
-        },
+        materials: true,
         progresses: {
-          where: { userId },
-          select: { materialId: true, lastPage: true, completed: true }
+          where: { userId }
         },
         _count: {
           select: { materials: true }
@@ -41,22 +38,10 @@ export const getWorkshopById = async (req: AuthRequest, res: Response) => {
       where: { id: parseInt(id as string) },
       include: {
         materials: {
-          select: {
-            id: true,
-            title: true,
-            type: true,
-            filename: true,
-            originalName: true,
-            fileSize: true,
-            pageCount: true,
-            url: true,
-            createdAt: true
-          },
           orderBy: { createdAt: 'asc' }
         },
         progresses: {
-          where: { userId },
-          select: { materialId: true, lastPage: true, completed: true }
+          where: { userId }
         }
       }
     });
