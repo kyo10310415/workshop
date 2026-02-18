@@ -35,17 +35,23 @@ async function main() {
   });
   console.log('Created test user:', user.email);
 
-  // Create sample workshop
-  const workshop = await prisma.workshop.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      title: 'はじめてのワークショップ',
-      description: 'これはサンプルのワークショップです。PDFをアップロードして使い始めましょう。',
-      isPublic: true
-    }
+  // Check if sample workshop already exists
+  const existingWorkshop = await prisma.workshop.findFirst({
+    where: { title: 'はじめてのワークショップ' }
   });
-  console.log('Created sample workshop:', workshop.title);
+
+  if (!existingWorkshop) {
+    const workshop = await prisma.workshop.create({
+      data: {
+        title: 'はじめてのワークショップ',
+        description: 'これはサンプルのワークショップです。PDFをアップロードして使い始めましょう。',
+        isPublic: true
+      }
+    });
+    console.log('Created sample workshop:', workshop.title);
+  } else {
+    console.log('Sample workshop already exists, skipping...');
+  }
 
   console.log('Seeding completed!');
 }

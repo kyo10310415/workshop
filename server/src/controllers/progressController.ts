@@ -8,33 +8,56 @@ export const getProgress = async (req: AuthRequest, res: Response) => {
     const { materialId } = req.query;
     const userId = req.user!.id;
 
-    const parsedMaterialId = materialId ? parseInt(materialId as string) : null;
-
-    const whereClause: any = {
-      userId_workshopId_materialId: {
-        userId,
-        workshopId: parseInt(workshopId as string),
-        materialId: parsedMaterialId
-      }
-    };
-
-    let progress = await prisma.progress.findUnique({
-      where: whereClause
-    });
-
-    if (!progress) {
-      progress = await prisma.progress.create({
-        data: {
+    // Try new schema first (with materialId)
+    try {
+      const parsedMaterialId = materialId ? parseInt(materialId as string) : null;
+      const whereClause: any = {
+        userId_workshopId_materialId: {
           userId,
           workshopId: parseInt(workshopId as string),
-          materialId: parsedMaterialId,
-          lastPage: 1,
-          completed: false
+          materialId: parsedMaterialId
+        }
+      };
+
+      let progress = await prisma.progress.findUnique({
+        where: whereClause
+      });
+
+      if (!progress) {
+        progress = await prisma.progress.create({
+          data: {
+            userId,
+            workshopId: parseInt(workshopId as string),
+            materialId: parsedMaterialId,
+            lastPage: 1,
+            completed: false
+          }
+        });
+      }
+
+      return res.json({ progress });
+    } catch (newSchemaError) {
+      // Fall back to old schema (without materialId)
+      let progress = await prisma.progress.findFirst({
+        where: {
+          userId,
+          workshopId: parseInt(workshopId as string)
         }
       });
-    }
 
-    return res.json({ progress });
+      if (!progress) {
+        progress = await prisma.progress.create({
+          data: {
+            userId,
+            workshopId: parseInt(workshopId as string),
+            lastPage: 1,
+            completed: false
+          }
+        });
+      }
+
+      return res.json({ progress });
+    }
   } catch (error) {
     console.error('Get progress error:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -50,9 +73,6 @@ export const getAllProgress = async (req: AuthRequest, res: Response) => {
       where: {
         userId,
         workshopId: parseInt(workshopId as string)
-      },
-      include: {
-        material: true
       }
     });
 
@@ -69,31 +89,58 @@ export const updateProgress = async (req: AuthRequest, res: Response) => {
     const { materialId, lastPage, completed } = req.body;
     const userId = req.user!.id;
 
-    const parsedMaterialId = materialId ? parseInt(materialId) : null;
-    const whereClause: any = {
-      userId_workshopId_materialId: {
-        userId,
-        workshopId: parseInt(workshopId as string),
-        materialId: parsedMaterialId
-      }
-    };
+    // Try new schema first (with materialId)
+    try {
+      const parsedMaterialId = materialId ? parseInt(materialId) : null;
+      const whereClause: any = {
+        userId_workshopId_materialId: {
+          userId,
+          workshopId: parseInt(workshopId as string),
+          materialId: parsedMaterialId
+        }
+      };
 
-    const progress = await prisma.progress.upsert({
-      where: whereClause,
-      update: {
-        ...(lastPage !== undefined && { lastPage: parseInt(lastPage) }),
-        ...(completed !== undefined && { completed })
-      },
-      create: {
-        userId,
-        workshopId: parseInt(workshopId as string),
-        materialId: parsedMaterialId,
-        lastPage: lastPage ? parseInt(lastPage) : 1,
-        completed: completed === true
-      }
-    });
+      const progress = await prisma.progress.upsert({
+        where: whereClause,
+        update: {
+          ...(lastPage !== undefined && { lastPage: parseInt(lastPage) }),
+          ...(completed !== undefined && { completed })
+        },
+        create: {
+          userId,
+          workshopId: parseInt(workshopId as string),
+          materialId: parsedMaterialId,
+          lastPage: lastPage ? parseInt(lastPage) : 1,
+          completed: completed === true
+        }
+      });
 
-    return res.json({ progress });
+      return res.json({ progress });
+    } catch (newSchemaError) {
+      // Fall back to old schema (without materialId)
+      const whereClause: any = {
+        userId_workshopId: {
+          userId,
+          workshopId: parseInt(workshopId as string)
+        }
+      };
+
+      const progress = await prisma.progress.upsert({
+        where: whereClause,
+        update: {
+          ...(lastPage !== undefined && { lastPage: parseInt(lastPage) }),
+          ...(completed !== undefined && { completed })
+        },
+        create: {
+          userId,
+          workshopId: parseInt(workshopId as string),
+          lastPage: lastPage ? parseInt(lastPage) : 1,
+          completed: completed === true
+        }
+      });
+
+      return res.json({ progress });
+    }
   } catch (error) {
     console.error('Update progress error:', error);
     return res.status(500).json({ error: 'Internal server error' });

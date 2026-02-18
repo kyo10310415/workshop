@@ -151,13 +151,16 @@ export default function Workshops() {
                           <span>進捗状況</span>
                           <span className="font-semibold">{progress.completed} / {progress.total} 資料</span>
                         </div>
-                        <div className="w-full bg-white bg-opacity-30 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-white bg-opacity-30 rounded-full h-2 overflow-hidden mb-1">
                           <div
                             className={`h-2 rounded-full transition-all duration-300 ${
                               progress.allCompleted ? 'bg-green-400' : 'bg-blue-400'
                             }`}
                             style={{ width: `${progress.percentage}%` }}
                           />
+                        </div>
+                        <div className="text-xs text-white text-center">
+                          {progress.allCompleted ? '✓ 完了' : `未完了 (${progress.percentage}%)`}
                         </div>
                       </div>
                     )}
