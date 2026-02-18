@@ -49,37 +49,54 @@ export default function Workshops() {
 
   const calculateOverallProgress = (workshop: Workshop) => {
     if (!workshop.materials || workshop.materials.length === 0) {
-      return { completed: 0, total: 0, percentage: 0, allCompleted: false };
+      return { 
+        completed: 0, 
+        total: 0, 
+        currentPage: 0,
+        totalPages: 0,
+        percentage: 0, 
+        allCompleted: false 
+      };
     }
 
     const totalMaterials = workshop.materials.length;
-    
-    // Check if we have any progresses
-    const hasProgresses = workshop.progresses && workshop.progresses.length > 0;
-    if (!hasProgresses) {
-      return { completed: 0, total: totalMaterials, percentage: 0, allCompleted: false };
-    }
-    
-    // Count completed materials by checking each material
+    let totalPages = 0;
+    let currentPage = 0;
     let completedMaterials = 0;
+    
+    // Calculate total pages and current progress
     workshop.materials.forEach(material => {
-      // Try to find progress by materialId (new schema)
-      const progressWithMaterial = workshop.progresses.find(p => p.materialId === material.id);
-      if (progressWithMaterial?.completed) {
-        completedMaterials++;
-      } else if (!progressWithMaterial) {
-        // Fallback: check if there's a progress without materialId (old schema)
-        const progressWithoutMaterial = workshop.progresses.find(p => !p.materialId);
-        if (progressWithoutMaterial?.completed) {
+      if (material.type === 'PDF' && material.pageCount > 0) {
+        totalPages += material.pageCount;
+        
+        // Find progress for this material
+        const progressWithMaterial = workshop.progresses?.find(p => p.materialId === material.id);
+        if (progressWithMaterial) {
+          currentPage += progressWithMaterial.lastPage || 0;
+          if (progressWithMaterial.completed) {
+            completedMaterials++;
+          }
+        }
+      } else {
+        // For non-PDF materials (external links), check completion only
+        const progressWithMaterial = workshop.progresses?.find(p => p.materialId === material.id);
+        if (progressWithMaterial?.completed) {
           completedMaterials++;
         }
       }
     });
     
-    const percentage = Math.round((completedMaterials / totalMaterials) * 100);
+    const percentage = totalMaterials > 0 ? Math.round((completedMaterials / totalMaterials) * 100) : 0;
     const allCompleted = completedMaterials === totalMaterials;
 
-    return { completed: completedMaterials, total: totalMaterials, percentage, allCompleted };
+    return { 
+      completed: completedMaterials, 
+      total: totalMaterials,
+      currentPage,
+      totalPages,
+      percentage, 
+      allCompleted 
+    };
   };
 
   if (loading) {
@@ -140,11 +157,6 @@ export default function Workshops() {
                         <svg className="w-4 h-4 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                         </svg>
-                        {workshop.isPublic && (
-                          <span className="px-2 py-0.5 bg-white text-purple-700 rounded-full text-xs font-semibold">
-                            グループ以上
-                          </span>
-                        )}
                         {progress.allCompleted && (
                           <span className="px-2 py-0.5 bg-green-500 text-white rounded-full text-xs font-semibold">
                             ✓ 完了
@@ -171,7 +183,11 @@ export default function Workshops() {
                       <div className="mt-3 bg-white bg-opacity-20 rounded-lg p-2">
                         <div className="flex justify-between text-xs text-white mb-1">
                           <span>進捗状況</span>
-                          <span className="font-semibold">{progress.completed} / {progress.total} 資料</span>
+                          {progress.totalPages > 0 ? (
+                            <span className="font-semibold">{progress.currentPage} / {progress.totalPages} ページ</span>
+                          ) : (
+                            <span className="font-semibold">{progress.completed} / {progress.total} 資料</span>
+                          )}
                         </div>
                         <div className="w-full bg-white bg-opacity-30 rounded-full h-2 overflow-hidden mb-1">
                           <div
