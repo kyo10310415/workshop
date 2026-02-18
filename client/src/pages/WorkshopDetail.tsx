@@ -145,6 +145,45 @@ export default function WorkshopDetail() {
     }
   };
 
+  const getDownloadUrl = (material: Material, format: string) => {
+    if (!material.url) return null;
+    
+    // Google Docs/Sheets のURLからドキュメントIDを抽出
+    const docMatch = material.url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (!docMatch) return null;
+    
+    const docId = docMatch[1];
+    
+    if (material.type === 'GOOGLE_DOCS') {
+      const formatMap: { [key: string]: string } = {
+        'pdf': 'pdf',
+        'docx': 'docx',
+        'txt': 'txt'
+      };
+      return `https://docs.google.com/document/d/${docId}/export?format=${formatMap[format]}`;
+    } else if (material.type === 'GOOGLE_SHEETS') {
+      const formatMap: { [key: string]: string } = {
+        'pdf': 'pdf',
+        'xlsx': 'xlsx',
+        'csv': 'csv'
+      };
+      return `https://docs.google.com/spreadsheets/d/${docId}/export?format=${formatMap[format]}`;
+    }
+    
+    return null;
+  };
+
+  const handleDownload = (e: React.MouseEvent, material: Material, format: string) => {
+    e.stopPropagation(); // カードのクリックイベントを防ぐ
+    
+    const downloadUrl = getDownloadUrl(material, format);
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+    } else {
+      alert('ダウンロードURLの生成に失敗しました');
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -235,6 +274,62 @@ export default function WorkshopDetail() {
                             </>
                           )}
                         </div>
+                        
+                        {/* ダウンロードボタン（Google Docs/Sheets のみ） */}
+                        {(material.type === 'GOOGLE_DOCS' || material.type === 'GOOGLE_SHEETS') && (
+                          <div className="ml-8 mt-3 flex flex-wrap gap-2">
+                            <span className="text-xs text-gray-600 flex items-center gap-1 mr-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                              ダウンロード:
+                            </span>
+                            {material.type === 'GOOGLE_DOCS' && (
+                              <>
+                                <button
+                                  onClick={(e) => handleDownload(e, material, 'pdf')}
+                                  className="px-2 py-1 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 text-xs font-medium"
+                                >
+                                  PDF
+                                </button>
+                                <button
+                                  onClick={(e) => handleDownload(e, material, 'docx')}
+                                  className="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 text-xs font-medium"
+                                >
+                                  Word
+                                </button>
+                                <button
+                                  onClick={(e) => handleDownload(e, material, 'txt')}
+                                  className="px-2 py-1 bg-gray-50 text-gray-700 border border-gray-200 rounded hover:bg-gray-100 text-xs font-medium"
+                                >
+                                  TXT
+                                </button>
+                              </>
+                            )}
+                            {material.type === 'GOOGLE_SHEETS' && (
+                              <>
+                                <button
+                                  onClick={(e) => handleDownload(e, material, 'pdf')}
+                                  className="px-2 py-1 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 text-xs font-medium"
+                                >
+                                  PDF
+                                </button>
+                                <button
+                                  onClick={(e) => handleDownload(e, material, 'xlsx')}
+                                  className="px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded hover:bg-green-100 text-xs font-medium"
+                                >
+                                  Excel
+                                </button>
+                                <button
+                                  onClick={(e) => handleDownload(e, material, 'csv')}
+                                  className="px-2 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded hover:bg-yellow-100 text-xs font-medium"
+                                >
+                                  CSV
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <button 
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2"

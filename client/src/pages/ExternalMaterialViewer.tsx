@@ -101,6 +101,45 @@ export default function ExternalMaterialViewer() {
     }
   };
 
+  const getDownloadUrl = (url: string, format: string) => {
+    // Google Docs/Sheets のURLからドキュメントIDを抽出
+    const docMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (!docMatch) return null;
+    
+    const docId = docMatch[1];
+    
+    if (material.type === 'GOOGLE_DOCS') {
+      // Google Docs のダウンロード形式
+      const formatMap: { [key: string]: string } = {
+        'pdf': 'pdf',
+        'docx': 'docx',
+        'txt': 'txt'
+      };
+      return `https://docs.google.com/document/d/${docId}/export?format=${formatMap[format]}`;
+    } else if (material.type === 'GOOGLE_SHEETS') {
+      // Google Sheets のダウンロード形式
+      const formatMap: { [key: string]: string } = {
+        'pdf': 'pdf',
+        'xlsx': 'xlsx',
+        'csv': 'csv'
+      };
+      return `https://docs.google.com/spreadsheets/d/${docId}/export?format=${formatMap[format]}`;
+    }
+    
+    return null;
+  };
+
+  const handleDownload = (format: string) => {
+    if (!material?.url) return;
+    
+    const downloadUrl = getDownloadUrl(material.url, format);
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+    } else {
+      alert('ダウンロードURLの生成に失敗しました');
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -158,6 +197,64 @@ export default function ExternalMaterialViewer() {
               </svg>
               外部リンクを開く
             </button>
+
+            {/* ダウンロードボタン */}
+            {(material.type === 'GOOGLE_DOCS' || material.type === 'GOOGLE_SHEETS') && (
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span className="font-semibold text-gray-700">ダウンロード</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {material.type === 'GOOGLE_DOCS' && (
+                    <>
+                      <button
+                        onClick={() => handleDownload('pdf')}
+                        className="px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 text-sm font-medium"
+                      >
+                        📄 PDF
+                      </button>
+                      <button
+                        onClick={() => handleDownload('docx')}
+                        className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 text-sm font-medium"
+                      >
+                        📝 Word (DOCX)
+                      </button>
+                      <button
+                        onClick={() => handleDownload('txt')}
+                        className="px-4 py-2 bg-gray-50 text-gray-700 border border-gray-200 rounded hover:bg-gray-100 text-sm font-medium"
+                      >
+                        📋 テキスト (TXT)
+                      </button>
+                    </>
+                  )}
+                  {material.type === 'GOOGLE_SHEETS' && (
+                    <>
+                      <button
+                        onClick={() => handleDownload('pdf')}
+                        className="px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 text-sm font-medium"
+                      >
+                        📄 PDF
+                      </button>
+                      <button
+                        onClick={() => handleDownload('xlsx')}
+                        className="px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded hover:bg-green-100 text-sm font-medium"
+                      >
+                        📊 Excel (XLSX)
+                      </button>
+                      <button
+                        onClick={() => handleDownload('csv')}
+                        className="px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded hover:bg-yellow-100 text-sm font-medium"
+                      >
+                        📈 CSV
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
 
             {externalWindowOpened && (
               <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded text-center">
