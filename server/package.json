@@ -9,7 +9,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed.js",
+    "prisma:force-migrate": "npx prisma migrate resolve --rolled-back 20260217164224_add_material_types_and_progress_by_material || true && npx prisma migrate deploy && npx prisma generate"
   },
   "keywords": [],
   "author": "",
