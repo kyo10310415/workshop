@@ -77,29 +77,51 @@ export default function WorkshopDetail() {
 
   const getOverallProgress = () => {
     if (!workshop || !workshop.materials || workshop.materials.length === 0) {
-      return { completed: 0, total: 0, percentage: 0 };
+      return { current: 0, total: 0, percentage: 0, label: '0 / 0 ページ' };
     }
 
-    const total = workshop.materials.length;
+    // PDFスライドのみをカウント（外部リンクは無視）
+    const pdfMaterials = workshop.materials.filter(m => m.type === 'PDF' || !m.type);
     
+    if (pdfMaterials.length === 0) {
+      return { current: 0, total: 0, percentage: 0, label: 'PDF資料なし' };
+    }
+
+    // 全PDFの総ページ数を計算
+    const totalPages = pdfMaterials.reduce((sum, material) => sum + (material.pageCount || 0), 0);
+    
+    if (totalPages === 0) {
+      return { current: 0, total: 0, percentage: 0, label: '0 / 0 ページ' };
+    }
+
     // Check if we have any progresses
     const hasProgresses = workshop.progresses && workshop.progresses.length > 0;
     if (!hasProgresses) {
-      return { completed: 0, total, percentage: 0 };
+      return { current: 0, total: totalPages, percentage: 0, label: `0 / ${totalPages} ページ` };
     }
     
-    // Count completed materials by checking each material's progress
-    let completed = 0;
-    workshop.materials.forEach(material => {
+    // 各PDFの読了ページ数を集計
+    let currentPages = 0;
+    pdfMaterials.forEach(material => {
       const progress = getMaterialProgress(material.id);
-      if (progress?.completed) {
-        completed++;
+      if (progress) {
+        // 完了している場合は全ページ、そうでない場合は lastPage まで
+        if (progress.completed) {
+          currentPages += material.pageCount || 0;
+        } else {
+          currentPages += Math.min(progress.lastPage || 0, material.pageCount || 0);
+        }
       }
     });
     
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const percentage = totalPages > 0 ? Math.round((currentPages / totalPages) * 100) : 0;
 
-    return { completed, total, percentage };
+    return { 
+      current: currentPages, 
+      total: totalPages, 
+      percentage,
+      label: `${currentPages} / ${totalPages} ページ`
+    };
   };
 
   const formatFileSize = (bytes?: number) => {
@@ -223,13 +245,13 @@ export default function WorkshopDetail() {
           </p>
 
           {/* Overall Progress */}
-          {workshop.materials.length > 0 && (
+          {workshop.materials.length > 0 && overallProgress.total > 0 && (
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-5">
               <h3 className="font-semibold text-purple-900 mb-3">全体の進捗状況</h3>
               <ProgressBar
-                current={overallProgress.completed}
+                current={overallProgress.current}
                 total={overallProgress.total}
-                completed={overallProgress.completed === overallProgress.total}
+                completed={overallProgress.current === overallProgress.total && overallProgress.total > 0}
                 showLabel={true}
               />
             </div>

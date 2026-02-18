@@ -50,52 +50,63 @@ export default function Workshops() {
   const calculateOverallProgress = (workshop: Workshop) => {
     if (!workshop.materials || workshop.materials.length === 0) {
       return { 
-        completed: 0, 
+        current: 0, 
         total: 0, 
-        currentPage: 0,
-        totalPages: 0,
         percentage: 0, 
-        allCompleted: false 
+        allCompleted: false,
+        label: '0 / 0 ページ'
       };
     }
 
-    const totalMaterials = workshop.materials.length;
-    let totalPages = 0;
-    let currentPage = 0;
-    let completedMaterials = 0;
+    // PDFスライドのみをカウント（外部リンクは無視）
+    const pdfMaterials = workshop.materials.filter(m => m.type === 'PDF');
     
-    // Calculate total pages and current progress
-    workshop.materials.forEach(material => {
-      if (material.type === 'PDF' && material.pageCount > 0) {
-        totalPages += material.pageCount;
-        
-        // Find progress for this material
-        const progressWithMaterial = workshop.progresses?.find(p => p.materialId === material.id);
-        if (progressWithMaterial) {
-          currentPage += progressWithMaterial.lastPage || 0;
-          if (progressWithMaterial.completed) {
-            completedMaterials++;
-          }
-        }
-      } else {
-        // For non-PDF materials (external links), check completion only
-        const progressWithMaterial = workshop.progresses?.find(p => p.materialId === material.id);
-        if (progressWithMaterial?.completed) {
-          completedMaterials++;
+    if (pdfMaterials.length === 0) {
+      return { 
+        current: 0, 
+        total: 0, 
+        percentage: 0, 
+        allCompleted: false,
+        label: 'PDF資料なし'
+      };
+    }
+
+    // 全PDFの総ページ数を計算
+    const totalPages = pdfMaterials.reduce((sum, material) => sum + (material.pageCount || 0), 0);
+    
+    if (totalPages === 0) {
+      return { 
+        current: 0, 
+        total: 0, 
+        percentage: 0, 
+        allCompleted: false,
+        label: '0 / 0 ページ'
+      };
+    }
+    
+    // 各PDFの読了ページ数を集計
+    let currentPages = 0;
+    pdfMaterials.forEach(material => {
+      const progressWithMaterial = workshop.progresses?.find(p => p.materialId === material.id);
+      if (progressWithMaterial) {
+        // 完了している場合は全ページ、そうでない場合は lastPage まで
+        if (progressWithMaterial.completed) {
+          currentPages += material.pageCount || 0;
+        } else {
+          currentPages += Math.min(progressWithMaterial.lastPage || 0, material.pageCount || 0);
         }
       }
     });
     
-    const percentage = totalMaterials > 0 ? Math.round((completedMaterials / totalMaterials) * 100) : 0;
-    const allCompleted = completedMaterials === totalMaterials;
+    const percentage = totalPages > 0 ? Math.round((currentPages / totalPages) * 100) : 0;
+    const allCompleted = currentPages === totalPages && totalPages > 0;
 
     return { 
-      completed: completedMaterials, 
-      total: totalMaterials,
-      currentPage,
-      totalPages,
+      current: currentPages, 
+      total: totalPages,
       percentage, 
-      allCompleted 
+      allCompleted,
+      label: `${currentPages} / ${totalPages} ページ`
     };
   };
 
@@ -183,11 +194,7 @@ export default function Workshops() {
                       <div className="mt-3 bg-white bg-opacity-20 rounded-lg p-2">
                         <div className="flex justify-between text-xs text-white mb-1">
                           <span>進捗状況</span>
-                          {progress.totalPages > 0 ? (
-                            <span className="font-semibold">{progress.currentPage} / {progress.totalPages} ページ</span>
-                          ) : (
-                            <span className="font-semibold">{progress.completed} / {progress.total} 資料</span>
-                          )}
+                          <span className="font-semibold">{progress.label}</span>
                         </div>
                         <div className="w-full bg-white bg-opacity-30 rounded-full h-2 overflow-hidden mb-1">
                           <div
