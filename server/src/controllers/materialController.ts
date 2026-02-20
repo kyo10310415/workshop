@@ -11,6 +11,12 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
     const { title } = req.body;
     const file = req.file;
 
+    console.log('=== Upload Material Debug ===');
+    console.log('File received:', file?.originalname);
+    console.log('File size:', file?.size);
+    console.log('Has buffer:', !!file?.buffer);
+    console.log('Has path:', !!file?.path);
+
     if (!file) {
       return res.status(400).json({ error: 'PDF file is required' });
     }
@@ -19,17 +25,23 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Only PDF files are allowed' });
     }
 
+    // Save file first
     const filename = await storageService.saveFile(file);
+    console.log('File saved as:', filename);
 
-    // Get PDF page count
+    // Get PDF page count from buffer (Multer uses memoryStorage)
     let pageCount = 0;
     try {
-      const dataBuffer = fs.readFileSync(file.path);
-      const pdfData = await (pdfParse as any)(dataBuffer);
+      console.log('Attempting to parse PDF...');
+      const pdfData = await (pdfParse as any)(file.buffer);
       pageCount = pdfData.numpages;
-      console.log(`PDF page count: ${pageCount}`);
+      console.log(`✓ PDF page count: ${pageCount}`);
     } catch (error) {
-      console.error('Failed to parse PDF:', error);
+      console.error('✗ Failed to parse PDF:', error);
+      console.error('Error details:', {
+        message: (error as Error).message,
+        stack: (error as Error).stack
+      });
       // Continue with pageCount = 0 if parsing fails
     }
 
@@ -44,6 +56,12 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
         mimeType: file.mimetype,
         pageCount
       }
+    });
+
+    console.log('Material created:', {
+      id: material.id,
+      title: material.title,
+      pageCount: material.pageCount
     });
 
     return res.status(201).json({ material });
