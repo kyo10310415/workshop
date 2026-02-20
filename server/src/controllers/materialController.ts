@@ -3,7 +3,7 @@ import prisma from '../utils/prisma';
 import { AuthRequest } from '../middlewares/auth';
 import { storageService } from '../services/storageService';
 import fs from 'fs';
-import * as pdfParse from 'pdf-parse';
+const pdfParse = require('pdf-parse');
 
 export const uploadMaterial = async (req: AuthRequest, res: Response) => {
   try {
@@ -33,7 +33,7 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
     let pageCount = 0;
     try {
       console.log('Attempting to parse PDF...');
-      const pdfData = await (pdfParse as any)(file.buffer);
+      const pdfData = await pdfParse(file.buffer);
       pageCount = pdfData.numpages;
       console.log(`✓ PDF page count: ${pageCount}`);
     } catch (error) {

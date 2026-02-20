@@ -1,7 +1,7 @@
 import prisma from '../utils/prisma';
 import { storageService } from '../services/storageService';
 import fs from 'fs';
-import * as pdfParse from 'pdf-parse';
+const pdfParse = require('pdf-parse');
 
 async function updatePageCounts() {
   try {
@@ -29,7 +29,7 @@ async function updatePageCounts() {
         }
 
         const dataBuffer = fs.readFileSync(filepath);
-        const pdfData = await (pdfParse as any)(dataBuffer);
+        const pdfData = await pdfParse(dataBuffer);
         const pageCount = pdfData.numpages;
 
         await prisma.material.update({
