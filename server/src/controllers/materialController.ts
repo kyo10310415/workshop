@@ -3,7 +3,10 @@ import prisma from '../utils/prisma';
 import { AuthRequest } from '../middlewares/auth';
 import { storageService } from '../services/storageService';
 import fs from 'fs';
-const pdfParse = require('pdf-parse');
+
+// pdf-parse uses CommonJS export, need to use require with default
+const pdfParseModule = require('pdf-parse');
+const pdfParse = pdfParseModule.default || pdfParseModule;
 
 export const uploadMaterial = async (req: AuthRequest, res: Response) => {
   try {

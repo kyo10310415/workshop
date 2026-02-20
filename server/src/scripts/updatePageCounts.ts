@@ -1,7 +1,10 @@
 import prisma from '../utils/prisma';
 import { storageService } from '../services/storageService';
 import fs from 'fs';
-const pdfParse = require('pdf-parse');
+
+// pdf-parse uses CommonJS export, need to use require with default
+const pdfParseModule = require('pdf-parse');
+const pdfParse = pdfParseModule.default || pdfParseModule;
 
 async function updatePageCounts() {
   try {
