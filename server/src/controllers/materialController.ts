@@ -4,9 +4,18 @@ import { AuthRequest } from '../middlewares/auth';
 import { storageService } from '../services/storageService';
 import fs from 'fs';
 
-// pdf-parse uses CommonJS export, need to use require with default
-const pdfParseModule = require('pdf-parse');
-const pdfParse = pdfParseModule.default || pdfParseModule;
+// Use dynamic import for pdf-parse to ensure CommonJS compatibility
+const getPdfParse = () => {
+  try {
+    const pdfParseModule = require('pdf-parse');
+    console.log('pdf-parse loaded, type:', typeof pdfParseModule);
+    console.log('pdf-parse.default type:', typeof pdfParseModule?.default);
+    return pdfParseModule.default || pdfParseModule;
+  } catch (error) {
+    console.error('Failed to load pdf-parse:', error);
+    return null;
+  }
+};
 
 export const uploadMaterial = async (req: AuthRequest, res: Response) => {
   try {
@@ -36,9 +45,16 @@ export const uploadMaterial = async (req: AuthRequest, res: Response) => {
     let pageCount = 0;
     try {
       console.log('Attempting to parse PDF...');
-      const pdfData = await pdfParse(file.buffer);
-      pageCount = pdfData.numpages;
-      console.log(`✓ PDF page count: ${pageCount}`);
+      const pdfParse = getPdfParse();
+      
+      if (!pdfParse) {
+        console.error('✗ pdf-parse module not available');
+      } else {
+        console.log('pdf-parse function type:', typeof pdfParse);
+        const pdfData = await pdfParse(file.buffer);
+        pageCount = pdfData.numpages;
+        console.log(`✓ PDF page count: ${pageCount}`);
+      }
     } catch (error) {
       console.error('✗ Failed to parse PDF:', error);
       console.error('Error details:', {
