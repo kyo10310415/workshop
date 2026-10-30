@@ -10,12 +10,13 @@ import { authenticate, requireAdmin } from '../middlewares/auth';
 
 const router = Router();
 
+// Restrict multipart array indices while retaining the existing file limit.
+const uploadLimits = { fileSize: 50 * 1024 * 1024, fieldArrayIndexLimit: 100 };
+
 // Configure multer for memory storage
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 50 * 1024 * 1024 // 50MB limit
-  }
+  limits: uploadLimits
 });
 
 // Admin routes
