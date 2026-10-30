@@ -481,3 +481,9 @@ kyo10310415
 ---
 
 **🎉 eラーニング管理システムが完成しました！デプロイ済みで、すべての機能が動作します！**
+
+## 2026-10 security verification
+
+JSON requests must be uncompressed; encoded JSON now returns HTTP 415 before authentication/business handlers to avoid CVE-2026-111181. Normal JSON and multipart contracts remain unchanged. Multer is updated within major version 2 to patched 2.5.x. Run `node --test server/test/security-acceptance.test.cjs` for isolated middleware/parser checks. Do not run the root start/build scripts as an audit: they install packages, run migrations and seed data. Live DB, PDF rendering and deployed sessions are separate acceptance checks.
+
+Multipart array field indices above 100 are rejected. Existing scalar form fields and file-size limits are retained.
